@@ -1,0 +1,54 @@
+
+syntax = "proto3";
+option go_package = ".;proto";
+
+message File {
+    string id = 1;
+    string path = 2;
+    int32  remain = 3;
+    string compress = 4;
+    string digest = 5;
+    string data = 6;
+}
+
+enum FileState {
+    FILE_RECEIVED = 0;
+    FILE_FAILED = 1;
+}
+
+message FileStatus {
+    string id = 1;
+    string path = 2;
+    FileState state = 3;
+    string error = 4; 
+}
+
+message ResourceStatus {
+    ResourceState state = 1;
+    string message = 2;
+}
+
+enum ResourceState {
+    RES_SUCCESS = 0;
+    RES_PENDING = 1;
+    RES_ERROR = 2;
+    RES_OTHER = 3;
+}
+
+message DeployStatus {
+    string id = 1;
+    map<string, ResourceState> resources = 2;
+}
+
+message Reply {
+    int32 code = 1;
+    string message = 2;
+}
+
+service Server {
+    rpc UpdateDeployStatus(DeployStatus) returns (Reply) {};
+}
+
+service Worker {
+    rpc SendDeployFile(stream File) returns (FileStatus) {};
+}
